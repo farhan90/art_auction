@@ -1,0 +1,19 @@
+from scapy.contrib.spiders import CrawlSpider,Rule
+from scrapy.contrib.linkextractors import LinkExtractor
+
+class ArtSpider(CrawlSpider):
+        name= 'art_spider'
+        allowed_domains=['sothebys.com']
+        start_urls=['http://www.sothebys.com/en/auctions/2014/contemporary-curated-n09196.html#&page=all&sort=lotNum-asc&viewMode=list']
+
+        rules=[Rule(LinkExtractor(allow=['/auctions/.*']),'parse_art')]
+
+        def parse_art(self,response):
+                art_item=ArtItem()
+                art_item['title']=response.xpath("//h4[@class="alt title"/a/text()").extract()
+                art_item['name']=response.xpath("//h4/a/text()").extract()
+                art_item['estimate]=response.xpath("//div[@class="estimate"]/div[@class="left-section"]/span[@class="range-to"]/text()).extract()
+
+                art_item['actual_price']=response.xpath("//div[@class="estimate"]/div[@class="left-section"]/span[@class="lot-sold"]/text()).extract()
+
+                return art_item
