@@ -1,25 +1,32 @@
 from scrapy.spider import BaseSpider
 from scrapy.selector import HtmlXPathSelector
 from art_auction.items import ArtAuctionItem
-from scrapy.contrib.spiders import CrawlSpider
+from scrapy.contrib.spiders import CrawlSpider, Rule
+from scrapy.contrib.linkextractors import LinkExtractor
+from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 
-class ArtSpider(BaseSpider):
+class ArtSpider(CrawlSpider):
         name= 'art_spider'
-        allowed_domains=['sothebys.com']
-        start_urls=['http://www.sothebys.com/en/auctions/2014/contemporary-curated-n09196.html#&page=all&sort=lotNum-asc&viewMode=list']
+        
+        def __init__(self, num=None, *args, **kwargs):
+                super(ArtSpider, self).__init__(*args, **kwargs)
+                self.allowed_domains=['sothebys.com']
 
-
+                
+                self.start_urls=['http://www.sothebys.com/en/auctions/ecatalogue/2014/contemporary-curated-n09196/lot.%s.html' % num]
+        
 
         def parse(self,response):
                 art_item=ArtAuctionItem()
                 hxs = HtmlXPathSelector(response)
-                #paths=hxs.select("/html/body/div[@id='bodyWrap']/div[contains(concat(' ',normalize-space(@class),' '),'auctions-container sale sale-list-page')]/section[@id='lot-list']/article[contains(concat(' ',normalize-space(@class),' '),'clearfix sale-article')]")
-                paths=response.selector.xpath("//div[@class='details']")
-                print paths
-                for path in paths:
-                	print path.xpath(".//h4")
-                	art_item['title']=path.xpath(".//h4[contains(concat(' ',normalize-space(@class),' '),'alt title')]/a/text()").extract()
-
+                art_item['lower_estimate']=response.xpath("//span[@class='range-from']/text()").extract()[0]
+                art_item['upper_estimate']=response.xpath("//span[@class='range-to']/text()").extract()[0]
+                art_item['title']=response.xpath("//div[@class='lotdetail-subtitle']/text()").extract()[0]
                 
-                		
+                art_item['name']=response.xpath("//div[@class='lotdetail-guarantee']/text()").extract()[0]
+                try:
+                        art_item['actual_price']=response.xpath("//div[@class='price-sold']/span/@data-price").extract()[0]
+                except:
+                        print 'Art is not sold'
+                        art_item['actual_price']=0
                 return art_item
