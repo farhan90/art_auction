@@ -4,7 +4,7 @@ from art_auction.items import ArtAuctionItem
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors import LinkExtractor
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
-
+import unicodedata
 class ArtSpider(CrawlSpider):
         name= 'art_spider'
         
@@ -13,12 +13,13 @@ class ArtSpider(CrawlSpider):
                 self.allowed_domains=['sothebys.com']
 
                 
-                self.start_urls=['http://www.sothebys.com/en/auctions/ecatalogue/2014/contemporary-curated-n09196/lot.%s.html' % num]
+                self.start_urls=['http://www.sothebys.com/en/auctions/ecatalogue/2014/impressionist-modern-art-day-sale-l14007/lot.%s.html' % num]
         
 
         def parse(self,response):
                 art_item=ArtAuctionItem()
                 hxs = HtmlXPathSelector(response)
+                art_item['currency']=response.xpath("//div[contains(concat(' ', normalize-space(@class), ' '),' dropdown currency-dropdown inline ')]/@data-default-currency").extract()[0]
                 art_item['lower_estimate']=response.xpath("//span[@class='range-from']/text()").extract()[0]
                 art_item['upper_estimate']=response.xpath("//span[@class='range-to']/text()").extract()[0]
                 art_item['title']=response.xpath("//div[@class='lotdetail-subtitle']/text()").extract()[0]
