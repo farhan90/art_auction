@@ -13,7 +13,28 @@ class ArtAuctionItem(Item):
     # name = scrapy.Field()
     title=Field()
     name= Field()
-    desc= Field()
-    estimate=Field()
+    upper_estimate=Field()
+    lower_estimate=Field()
     actual_price=Field()
+    currency=Field()
     pass
+
+class ArtInfoItem(Item):
+	actual_price=Field()
+	date=Field()
+	size=Field()
+	medium=Field()
+	title=Field()
+	name=Field()
+	birth=Field()
+	death=Field()
+	pass
+
+class ArtChristieItem(Item):
+	actual_price=Field()
+	upper_estimate=Field()
+	lower_estimate=Field()
+	date=Field()
+	name=Field()
+	title=Field()	
+
