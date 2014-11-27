@@ -38,3 +38,16 @@ class ArtChristieItem(Item):
 	name=Field()
 	title=Field()	
 
+class ArtEstItem(Item):
+    # define the fields for your item here like:
+    # name = scrapy.Field()
+    title=Field()
+    name= Field()
+    upper_estimate=Field()
+    lower_estimate=Field()
+    actual_price=Field()
+    currency=Field()
+    date=Field()
+    pass
+
+
